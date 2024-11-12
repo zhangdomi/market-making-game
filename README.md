@@ -1,3 +1,3 @@
 # market-making-game
 
-A market making to maximize profits. 
+A market making game to maximize profits. 
