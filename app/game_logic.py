@@ -53,7 +53,7 @@ class Player:
             }
         else:
             self.budget -= quantity * price
-            self.position = 
+            self.position = quantity
 
     def sell(self, quantity, price):
         if quantity * price > self.budget:
@@ -64,12 +64,15 @@ class Player:
             }
         else:
             self.budget -= quantity * price
+            self.position = -quantity
 
     def skip(quantity, price):
         ROUNDS += 1
-        
-        
-    def calc_pnl():
+    
+    def increase_budget(self, amt):
+        self.budget += amt
+
+
 
 
 
@@ -117,17 +120,51 @@ class Round:
             return [mid_point - 1, mid_point + 1] 
 
 
-    #TODO: finish this one
-    def reveal_cards():
-        return 
+    #reveal and calculate value of cards
+    def reveal_cards(self):
+        realized_value = sum(card.get_card_rank() for card in self.cards)
+        return realized_value
+ 
+    def calc_round_pnl(self, player_action, quantity, price):
+        realized_value = self.reveal_cards()
 
-    def calc_round_pnl():
+        if player_action == 'buy':
+            pnl = (realized_value - price) * quantity
+        elif player_action == 'sell':
+            pnl = (price - realized_value) * quantity
+        else:
+            pnl = 0
+
+        return {
+            "pnl": pnl,
+            "realized_value": realized_value,
+            "market_price": price,
+            "player_action": player_action
+        }
+
+    def pnl_guess(self,player, pnl, guess):
+        if pnl == guess:
+            player.increase_budget(pnl)
+            return {
+                "result": "correct",
+                "message": "Correct guess! PnL has been added to your budget.",
+                "budget": player.budget
+            }
+
+        else:
+            player.increase_budget(-50)
+            return {
+                "result": "incorrect",
+                "message": "Incorrect guess. A penalty of $50 has been applied, and you do not receive the profit.",
+                "budget": player.budget
+            }
+
+
+
 
 
 
 class Game:
     def __init__(self, rounds):
         ROUNDS = rounds
-        
-        #comment
         
