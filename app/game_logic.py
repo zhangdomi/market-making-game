@@ -73,15 +73,11 @@ class Player:
         self.budget += amt
 
 
-
-
-
-
-
 class Round:
     def __init__(self):
-        self.cards = self.generate_cards()
         self.face_up_amt = 0
+        self.cards = self.generate_cards()
+        self.market = []
 
     #generates 3 cards for the round
     def generate_cards(self):
@@ -102,13 +98,17 @@ class Round:
         return cards
 
     #make a bid/ask market
+    #sets market
     def make_market(self):
         if self.face_up_amt == 0:
             mid_point = 3 * AVG
             if random.random() < 0.3:
                 offset = random.uniform(-0.3, 0.3) * mid_point  # +/- up to 30% of mid_point
                 mid_point += offset
-            return [mid_point - 1, mid_point + 1]
+                round(mid_point)
+                if mid_point < 0:
+                    return "market is negative."
+            self.market = [mid_point - 1, mid_point + 1]
         else:
             face_up_card = next(card for card in self.cards if card.face_up)  
             face_up_value = face_up_card.get_card_rank()
@@ -117,7 +117,7 @@ class Round:
             if random.random() < 0.3:
                 offset = random.uniform(-0.3, 0.3) * mid_point  # +/- up to 30% of mid_point
                 mid_point += offset
-            return [mid_point - 1, mid_point + 1] 
+            self.market = [mid_point - 1, mid_point + 1] 
 
 
     #reveal and calculate value of cards
@@ -142,29 +142,73 @@ class Round:
             "player_action": player_action
         }
 
-    def pnl_guess(self,player, pnl, guess):
+    def eval_guess(self, player, pnl, guess):
         if pnl == guess:
             player.increase_budget(pnl)
-            return {
+            result = {
                 "result": "correct",
                 "message": "Correct guess! PnL has been added to your budget.",
                 "budget": player.budget
             }
-
         else:
             player.increase_budget(-50)
-            return {
+            result = {
                 "result": "incorrect",
                 "message": "Incorrect guess. A penalty of $50 has been applied, and you do not receive the profit.",
                 "budget": player.budget
             }
+        
+        if self.round_num >= ROUNDS:
+            self.state = "results"
 
-
-
-
+        player.position = 0
+        return result
 
 
 class Game:
     def __init__(self, rounds):
+        self.player = Player()
         ROUNDS = rounds
+        self.curr_round = None       #stores a Round class
+        self.round_num = 0
+        self.final_results = None
+        self.state = "lobby"
+
+    def start_game(self):
+        self.round_num = 0
+        self.state = "round"
+        return self.start_round()
+    
+    def start_round(self):
+        self.round_num += 1
+        self.curr_round = Round()
+        self.curr_round.make_market()
+
+        return {
+            "message": f"Round {self.round_num}",
+            "market_info": self.curr_round.market,
+            "budget": self.player.budget,
+            "position": self.player.position
+        }
+
+
+    def execute_action(self, action_type, quantity):
+        bid_price, ask_price = self.curr_round.market
+
+        if action_type == "buy":
+            action_result = self.player.buy(quantity=quantity, price= ask_price)
+        elif action_type == "sell":
+            action_result = self.player.buy(quantity=quantity, price= bid_price) 
+        else:
+            action_result = {"message": "Round skipped."}
         
+        return {
+            "message": action_result.get("message", "Action completed."),
+            "budget": self.player.budget,
+            "position": self.player.position
+        }
+
+    #TODO
+    def eval_guess(self, guess):
+        #finish this
+        return 
