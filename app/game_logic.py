@@ -21,6 +21,7 @@ class Card:
             return 14
         else:
             return int(self.rank)
+        
 
     def get_card_suit(self):
         if self.suit == 'C':
@@ -43,7 +44,10 @@ class Player:
     def __init__(self):
         self.budget = 500
         self.position = 0
-    
+
+    def get_budget(self): return self.budget
+    def get_position(self): return self.position
+
     def buy(self, quantity, price):
         if quantity * price > self.budget:
             self.budget -= 50
@@ -144,28 +148,6 @@ class Round:
             "player_action": player_action
         }
 
-    # def eval_guess(self, player, pnl, guess):
-    #     if pnl == guess:
-    #         player.increase_budget(pnl)
-    #         result = {
-    #             "result": "correct",
-    #             "message": "Correct guess! PnL has been added to your budget.",
-    #             "budget": player.budget
-    #         }
-    #     else:
-    #         player.increase_budget(-50)
-    #         result = {
-    #             "result": "incorrect",
-    #             "message": "Incorrect guess. A penalty of $50 has been applied, and you do not receive the profit.",
-    #             "budget": player.budget
-    #         }
-        
-    #     if self.round_num >= ROUNDS:
-    #         self.state = "results"
-
-    #     player.position = 0
-    #     return result
-
 
 class Game:
     def __init__(self, rounds):
@@ -202,7 +184,7 @@ class Game:
         if action_type == "buy":
             action_result = self.player.buy(quantity=quantity, price= ask_price)
         elif action_type == "sell":
-            action_result = self.player.buy(quantity=quantity, price= bid_price) 
+            action_result = self.player.sell(quantity=quantity, price= bid_price) 
         else:
             action_result = {"message": "Round skipped."}
         
@@ -212,12 +194,11 @@ class Game:
             "position": self.player.position
         }
 
-    #TODO
     def eval_guess(self, player, guess):
         if self.last_action == "buy":
-            actual_pnl = self.curr_round.calc_round_pnl(self.last_action, self.player.position, self.curr_round.market[1])
+            actual_pnl = self.curr_round.calc_round_pnl(self.last_action, self.player.position, self.curr_round.market[1])["pnl"]
         elif self.last_action == "sell":
-            actual_pnl = self.curr_round.calc_round_pnl(self.last_action, self.player.position, self.curr_round.market[0]) 
+            actual_pnl = self.curr_round.calc_round_pnl(self.last_action, self.player.position, self.curr_round.market[0])["pnl"]
             
         if actual_pnl == guess:
             player.increase_budget(actual_pnl)
@@ -237,5 +218,18 @@ class Game:
         if self.round_num >= ROUNDS:
             self.state = "results"
 
+        action_qty = abs(self.player.position)
         player.position = 0
+        self.round_history.append({
+            "round": self.round_num,
+            "market": [self.curr_round.market[0], self.curr_round.market[1]],
+            "action": self.last_action,
+            "quantity": action_qty,
+            "pnl": actual_pnl,
+            "player_guess": guess,  
+            "correct_guess": actual_pnl == guess,
+            "budget": self.player.budget
+        })
         return result
+    
+    
