@@ -124,45 +124,47 @@ class Round:
     def reveal_cards(self):
         realized_value = sum(card.get_card_rank() for card in self.cards)
         return realized_value
- 
-    def calc_round_pnl(self, player_action, quantity, price):
+    
+    #calculate actual pnl, based on player's action
+    #param: player's action, quantity, market_price
+    def calc_round_pnl(self, player_action, input_quantity, input_price):
         realized_value = self.reveal_cards()
 
         if player_action == 'buy':
-            pnl = (realized_value - price) * quantity
+            pnl = (realized_value - input_price) * input_quantity
         elif player_action == 'sell':
-            pnl = (price - realized_value) * quantity
+            pnl = (input_price - realized_value) * input_quantity
         else:
             pnl = 0
 
         return {
             "pnl": pnl,
             "realized_value": realized_value,
-            "market_price": price,
+            "market_price": input_price,
             "player_action": player_action
         }
 
-    def eval_guess(self, player, pnl, guess):
-        if pnl == guess:
-            player.increase_budget(pnl)
-            result = {
-                "result": "correct",
-                "message": "Correct guess! PnL has been added to your budget.",
-                "budget": player.budget
-            }
-        else:
-            player.increase_budget(-50)
-            result = {
-                "result": "incorrect",
-                "message": "Incorrect guess. A penalty of $50 has been applied, and you do not receive the profit.",
-                "budget": player.budget
-            }
+    # def eval_guess(self, player, pnl, guess):
+    #     if pnl == guess:
+    #         player.increase_budget(pnl)
+    #         result = {
+    #             "result": "correct",
+    #             "message": "Correct guess! PnL has been added to your budget.",
+    #             "budget": player.budget
+    #         }
+    #     else:
+    #         player.increase_budget(-50)
+    #         result = {
+    #             "result": "incorrect",
+    #             "message": "Incorrect guess. A penalty of $50 has been applied, and you do not receive the profit.",
+    #             "budget": player.budget
+    #         }
         
-        if self.round_num >= ROUNDS:
-            self.state = "results"
+    #     if self.round_num >= ROUNDS:
+    #         self.state = "results"
 
-        player.position = 0
-        return result
+    #     player.position = 0
+    #     return result
 
 
 class Game:
@@ -171,8 +173,9 @@ class Game:
         ROUNDS = rounds
         self.curr_round = None       #stores a Round class
         self.round_num = 0
-        self.final_results = None
         self.state = "lobby"
+        self.last_action = None
+        self.round_history = []
 
     def start_game(self):
         self.round_num = 0
@@ -194,6 +197,7 @@ class Game:
 
     def execute_action(self, action_type, quantity):
         bid_price, ask_price = self.curr_round.market
+        self.last_action = action_type
 
         if action_type == "buy":
             action_result = self.player.buy(quantity=quantity, price= ask_price)
@@ -209,6 +213,29 @@ class Game:
         }
 
     #TODO
-    def eval_guess(self, guess):
-        #finish this
-        return 
+    def eval_guess(self, player, guess):
+        if self.last_action == "buy":
+            actual_pnl = self.curr_round.calc_round_pnl(self.last_action, self.player.position, self.curr_round.market[1])
+        elif self.last_action == "sell":
+            actual_pnl = self.curr_round.calc_round_pnl(self.last_action, self.player.position, self.curr_round.market[0]) 
+            
+        if actual_pnl == guess:
+            player.increase_budget(actual_pnl)
+            result = {
+                "result": "correct",
+                "message": "Correct guess! PnL has been added to your budget.",
+                "budget": player.budget
+            }
+        else:
+            player.increase_budget(-50)
+            result = {
+                "result": "incorrect",
+                "message": "Incorrect guess. A penalty of $50 has been applied, and you do not receive the profit.",
+                "budget": player.budget
+            }
+        
+        if self.round_num >= ROUNDS:
+            self.state = "results"
+
+        player.position = 0
+        return result
