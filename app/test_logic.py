@@ -90,29 +90,57 @@ class TestRound(unittest.TestCase):
 
 
 class TestGame(unittest.TestCase):
-    game = Game(3)
+    def setUp(self):
+        self.game = Game(3)
 
     def test_start_game(self):
         self.assertTrue(self.game.state == "lobby")
         self.game.start_game()
         self.assertEqual(self.game.round_num, 1)
-        self.assertEqual("message", "Round 1")
+        self.assertEqual(self.game.start_round()["message"], "Round 1")
         self.assertTrue(self.game.state == "round")
         
     def test_execute_action_buy(self):
         self.game.start_game()
         self.game.curr_round.market = [27, 29]
+    
+        #valid buy order
         result = self.game.execute_action("buy", 10)
-        self.assertEqual(result["budget"], 210)
         self.assertEqual(result["position"], 10)
+
+        #invalid buy order
+        self.game.player.budget = 500
+        self.game.player.position = 0
+        result = self.game.execute_action("buy", 20)
+        self.assertEqual(result["budget"], 450)
         self.assertIn("message", result)
     
-    #TODO: finish
     def test_eval_guess_buy(self):
-        return #delete this
+        self.game.start_game()
+        self.game.curr_round.market = [27,29]
+        quantity = 10
+        ask_price = 29
+        self.game.execute_action("buy", quantity=quantity)
+        self.assertEqual(self.game.player.position, quantity)
+
+        self.game.curr_round.reveal_cards = lambda: 35 #manually setting realized value of cards to 35
+        expected_pnl = (35 - ask_price) * quantity
+
+        #test w/ correct guess
+        result_of_correct_guess = self.game.eval_guess(expected_pnl)
+        self.assertEqual(result_of_correct_guess["result"], "correct")
+        self.assertEqual(result_of_correct_guess["budget"], 500 + expected_pnl)
+        self.assertEqual(self.game.player.budget, 500 + expected_pnl)
+
+        #test w/ incorrect guess
+        self.game.player.budget = 500
+        result_of_incorrect_guess = self.game.eval_guess(expected_pnl + 10)
+        self.assertEqual(result_of_incorrect_guess["result"], "incorrect")
+        self.assertEqual(result_of_incorrect_guess["budget"], 450)
+        self.assertEqual(self.game.player.budget, 450)
+ 
 
     #TODO: think about mechanics of selling and how if affects budgeting
-    game = Game(3)
     def test_execute_action_sell(self):
         self.game.start_game()
         self.game.curr_round.market = [27, 29]
@@ -121,4 +149,28 @@ class TestGame(unittest.TestCase):
         self.assertEqual(result["position"], 10)
         self.assertIn("message", result)
 
-   #TODO: test execution(skip)
+    def test_eval_guess_sell(self):
+        self.game.start_game()
+        self.game.curr_round.market = [27,29]
+        quantity = 10
+        bid_price = 27
+        self.game.execute_action("sell", quantity=quantity) 
+        
+        self.assertEqual(self.game.player.budget, 500) #test if budget changes after sell order
+        self.assertEqual(self.game.player.position, -quantity)
+        
+        self.game.curr_round.reveal_cards = lambda: 35 #manually setting realized value of cards to 35
+        expected_pnl = (bid_price - 35) * quantity 
+        
+        #correct guess
+        result_correct_guess = self.game.eval_guess(expected_pnl)
+        self.assertEqual(result_correct_guess["result"], "correct")
+        self.assertEqual(result_correct_guess["budget"], 500 + expected_pnl)
+        self.assertEqual(self.game.player.budget, 500 + expected_pnl)
+
+        #incorrect guess
+        self.game.player.budget = 500
+        result_incorrect_guess = self.game.eval_guess(expected_pnl + 10)
+        self.assertEqual(result_correct_guess["result"], "incorrect")
+        self.assertEqual(result_correct_guess["budget"], 450)
+        self.assertEqual(self.game.player.budget, 450)

@@ -4,7 +4,6 @@ import random
 RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
 SUITS = ['C', 'H', 'S', 'D']
 AVG = 8
-ROUNDS = 0
 
 class Card:
     def __init__(self, rank, suit):
@@ -44,6 +43,8 @@ class Player:
     def __init__(self):
         self.budget = 500
         self.position = 0
+        self.sell_price = None
+        self.buy_price = None
 
     def get_budget(self): return self.budget
     def get_position(self): return self.position
@@ -56,23 +57,21 @@ class Player:
             "message": "Insufficient funds. A penalty of $50 has been applied.",
             }
         else:
-            self.budget -= quantity * price
             self.position = quantity
+            self.buy_price = price
 
-    def sell(self, quantity, price):
-        if quantity * price > self.budget:
+    def sell(self, quantity, bid_price):
+        if quantity * bid_price > self.budget:
             self.budget -= 50
             return {
             "status": "error",
             "message": "Insufficient funds. A penalty of $50 has been applied.",
             }
         else:
-            self.budget -= quantity * price
+            # self.budget -= quantity * price
             self.position = -quantity
+            self.sell_price = bid_price
 
-    def skip(quantity, price):
-        ROUNDS += 1
-    
     def increase_budget(self, amt):
         self.budget += amt
 
@@ -131,20 +130,23 @@ class Round:
     
     #calculate actual pnl, based on player's action
     #param: player's action, quantity, market_price
-    def calc_round_pnl(self, player_action, input_quantity, input_price):
+    def calc_round_pnl(self, player, player_action, input_quantity):
         realized_value = self.reveal_cards()
 
         if player_action == 'buy':
-            pnl = (realized_value - input_price) * input_quantity
+            pnl = (realized_value - player.buy_price) * input_quantity
+            market_price = player.buy_price
         elif player_action == 'sell':
-            pnl = (input_price - realized_value) * input_quantity
+            pnl = (player.sell_price - realized_value) * input_quantity
+            market_price = player.sell_price
         else:
             pnl = 0
+            market_price = None
 
         return {
             "pnl": pnl,
             "realized_value": realized_value,
-            "market_price": input_price,
+            "market_price": market_price,
             "player_action": player_action
         }
 
@@ -152,7 +154,7 @@ class Round:
 class Game:
     def __init__(self, rounds):
         self.player = Player()
-        ROUNDS = rounds
+        self.total_rounds = rounds
         self.curr_round = None       #stores a Round class
         self.round_num = 0
         self.state = "lobby"
@@ -194,32 +196,36 @@ class Game:
             "position": self.player.position
         }
 
-    def eval_guess(self, player, guess):
-        if self.last_action == "buy":
-            actual_pnl = self.curr_round.calc_round_pnl(self.last_action, self.player.position, self.curr_round.market[1])["pnl"]
-        elif self.last_action == "sell":
-            actual_pnl = self.curr_round.calc_round_pnl(self.last_action, self.player.position, self.curr_round.market[0])["pnl"]
+    def eval_guess(self, guess):
+        quantity = abs(self.player.position)
+
+        actual_pnl = self.curr_round.calc_round_pnl(self.player, self.last_action, quantity)["pnl"]
+
+        # if self.last_action == "buy":
+        #     actual_pnl = self.curr_round.calc_round_pnl(self.last_action, self.player.position, self.curr_round.market[1])["pnl"]
+        # elif self.last_action == "sell":
+        #     actual_pnl = self.curr_round.calc_round_pnl(self.last_action, self.player.position, self.curr_round.market[0])["pnl"]
             
         if actual_pnl == guess:
-            player.increase_budget(actual_pnl)
+            self.player.increase_budget(actual_pnl)
             result = {
                 "result": "correct",
                 "message": "Correct guess! PnL has been added to your budget.",
-                "budget": player.budget
+                "budget": self.player.budget
             }
         else:
-            player.increase_budget(-50)
+            self.player.increase_budget(-50)
             result = {
                 "result": "incorrect",
                 "message": "Incorrect guess. A penalty of $50 has been applied, and you do not receive the profit.",
-                "budget": player.budget
+                "budget": self.player.budget
             }
         
-        if self.round_num >= ROUNDS:
+        if self.round_num >= self.total_rounds:
             self.state = "results"
 
         action_qty = abs(self.player.position)
-        player.position = 0
+        self.player.position = 0
         self.round_history.append({
             "round": self.round_num,
             "market": [self.curr_round.market[0], self.curr_round.market[1]],
@@ -231,5 +237,4 @@ class Game:
             "budget": self.player.budget
         })
         return result
-    
     
