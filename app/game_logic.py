@@ -48,6 +48,8 @@ class Player:
 
     def get_budget(self): return self.budget
     def get_position(self): return self.position
+    # def get_buy_price(self): return self.buy_price
+    # def get_sell_price(self): return self._price 
 
     def buy(self, quantity, price):
         if quantity * price > self.budget:
@@ -113,7 +115,7 @@ class Round:
                     return "market is negative."
             self.market = [mid_point - 1, mid_point + 1]
         else:
-            face_up_card = next(card for card in self.cards if card.face_up)  
+            face_up_card = next(card for card in self.cards if card.face_up == True)  
             face_up_value = face_up_card.get_card_rank()
             mid_point = 3 * AVG - face_up_value
 
@@ -135,6 +137,8 @@ class Round:
 
         if player_action == 'buy':
             pnl = (realized_value - player.buy_price) * input_quantity
+            # print("GAME - Buy Price:", player.buy_price)
+            # print("GAME - Realized val:", realized_value)
             market_price = player.buy_price
         elif player_action == 'sell':
             pnl = (player.sell_price - realized_value) * input_quantity
@@ -184,14 +188,14 @@ class Game:
         self.last_action = action_type
 
         if action_type == "buy":
-            action_result = self.player.buy(quantity=quantity, price= ask_price)
+            action_result = self.player.buy(quantity, ask_price)
         elif action_type == "sell":
-            action_result = self.player.sell(quantity=quantity, price= bid_price) 
+            action_result = self.player.sell(quantity, bid_price) 
         else:
             action_result = {"message": "Round skipped."}
         
         return {
-            "message": action_result.get("message", "Action completed."),
+            "message": action_result["message"] if isinstance(action_result, dict) else "Action completed.",
             "budget": self.player.budget,
             "position": self.player.position
         }
