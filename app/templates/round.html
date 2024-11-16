@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Game Round</title>
+        <script src="/static/round.js" defer></script>
+    </head>
+    <body>
+        <div class="card">
+            <div class="three-cards">
+                <div class="card-holder">
+                    <div></div>
+                </div>
+            </div>
+            <div class="round-no", id="roundNumber"></div>
+            <div class="market-and-action">
+                <p id="marketInfo">Market information will appear here</p>
+                <div class="action-quantity">
+                    <input type="text" id="own-quantity" placeholder="Enter quantity">
+                    <button id="qty1">1</button>
+                    <button id="qty5">5</button> 
+                    <button id="qty10">10</button>
+                </div>
+                <div class="action-action">
+                    <button id="buy">Buy</button>
+                    <button id="sell">Sell</button>
+                    <button id="skip">Skip</button>
+                </div>
+            </div>
+            <div class="card-footer">
+                <p id="curr-budget">Budget: </p>
+            </div>
+        </div>
+    </body>
+</html>

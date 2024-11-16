@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Market Making Game</title>
+    <script src="/static/main.js" defer></script>
+</head>
+<body>
+    <section class="wrapper">
+        <div class="main-card">
+            <div class="settings-card">
+                <div class="header">
+                    <div class="form-containing-settings-card">
+                        <form class="settings">
+                            <div class="left-col">
+                                <div class="level-selection">
+                                    <ul class="choices">
+                                        <li>
+                                            <label><input type="radio" name="question0" value="Easy" /><span>Easy</span></label>
+                                        </li>
+                                        <li>
+                                            <label><input type="radio" name="question0" value="Medium" /><span>Medium</span></label>
+                                        </li>
+                                        <li>
+                                            <label><input type="radio" name="question0" value="Hard" /><span>Hard</span></label>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="market-events">
+                                    <label class="switch"><input type="checkbox">
+                                        <span class="slider round">Market events</span>
+                                      </label>
+                                </div>
+                            </div>
+                            <div class="right-col">
+                                <div class="num-cards">
+                                    <p>Number of cards: </p>
+                                    <div class="slidecontainer-cards">
+                                        <input type="range" min="3" max="5" value="3" class="slider" id="myRange"> 
+                                    </div>
+                                </div>
+                                <div class="num-rounds">
+                                    <p>Number of rounds: </p>
+                                    <div class="slidecontainer-rounds">
+                                        <input type="range" min="3" max="10" value="3" class="slider" id="myRange">
+                                    </div> 
+                                </div>
+                                <div class="num-seconds">
+                                    <p>Number of seconds:</p>
+                                    <div class="slidecontainer-seconds">
+                                        <input type="range" min="10" max="60" value="60" class="slider" id="myRange">
+                                    </div> 
+                                </div>
+                            </div>
+                        </form>
+                        <div class="start-button">
+                            <button id="startGame">Start Game</button>
+                            <!-- <button id="startGame">Loading</button>                    add loading spin on the button  -->
+                        </div>
+                    </div>
+                </div>  
+            </div>
+            <div class="explanation">
+                <h5 class="title">Welcome to the Market making game!</h5>
+                <p class="text-bold mb-0">Objective </p>
+                <p>Maximize your expected profit over a series of trading rounds.</p>
+                <p class="text-bold mb-0">How to Play</p>
+                <p>At the beginning of each round, you will be presented with a set of cards. These cards are valued between 2 and 14, with the Ace being worth 14. Some of these cards may be turned face up, while others remain face down. </p>
+                <div class="cards">
+
+                </div>
+                <p class="text-bold mb-0">Market Maker Quote</p>
+                <p>Alongside the cards, you'll see a market maker quote displayed as X at Y. Here's what they represent: </p>
+                <ul><li>X (Bid): The price the market maker is willing to buy at. </li><li>Y (Ask): The price the market maker is willing to sell at. </li></ul>
+                <p class="text-bold mb-0">Time to trade</p>
+                <ul><li>Decide the number of units you wish to trade.</li><li>Choose whether you want to buy (at the Ask price) or sell (at the Bid price) those units at the given market maker quote</li><li>Just like in the real market, an offer remains valid only for a limited amount of time. So, act quickly!</li></ul>
+                <p class="text-bold mb-0">Valid orders</p>
+                <ul><li>You should be able to afford any long position you take as well as cover the maximum loss for any short position based on your budget.</li><li>Failure to do so will result in a 50$ deduction.</li></ul>
+                <p class="text-bold mb-0">Outcome</p> 
+                <p>Once you make a decision (buy, sell or skip) the cards are turned over:</p>
+                <ul><li>The sum of the card values represent the market price for that round.</li><li>Based on your decision and the resulting market price, you'll either realize a profit or a loss.</li></ul>
+                <p class="text-bold mb-0">Track your position</p>   
+                <p>After each round, you'll be asked to calculate your profit or losses.</p>
+                <p>Good luck!</p>             
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>

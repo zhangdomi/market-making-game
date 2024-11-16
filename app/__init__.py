@@ -1,11 +1,12 @@
 from flask import Flask
-from .routes import api
+
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object('config')
-
+    # app.config.from_object('config')
+    
+    from .routes import app as routes
     # Register the blueprint
-    app.register_blueprint(api)
+    app.register_blueprint(routes)
 
     return app
