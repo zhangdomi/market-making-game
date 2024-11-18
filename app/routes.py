@@ -6,7 +6,7 @@ app = Blueprint('app',__name__)
 
 game = Game(rounds=3)
 
-@app.route("/lobby")
+@app.route("/")
 def lobby():
     return render_template("lobby.html")  # Lobby page
 
@@ -16,14 +16,23 @@ def round_page():
         if game.state == "results":
             return render_template("results.html")
         if game.round_num == 0:
-            game.start_game()
-        market_info = game.start_round()
-        return jsonify({
-            "market_info": market_info,
-            "budget": game.player.budget,
-            "position": game.player.position,
-            "round": game.round_num
-        })
+            market_info = game.start_game()
+            return render_template(
+            "round.html",
+            market_info=market_info["market_info"],
+            budget=game.player.budget,
+            position=game.player.position,
+            round=game.round_num
+        )
+        elif game.round_num != 0:
+            market_info = game.start_round()
+            return render_template(
+                "round.html",
+                market_info=market_info["market_info"],
+                budget=game.player.budget,
+                position=game.player.position,
+                round=game.round_num
+            )
     if request.method == "POST":
         data = request.json
         # pnl eval phase

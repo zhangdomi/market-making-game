@@ -12,9 +12,9 @@
                     <div></div>
                 </div>
             </div>
-            <div class="round-no", id="roundNumber"></div>
+            <div class="round-no" id="roundNumber">Round {{ round }}</div>
             <div class="market-and-action">
-                <p id="marketInfo">Market information will appear here</p>
+                <p id="marketInfo">The market maker quotes {{ market_info[0] }} at {{ market_info[1] }}.</p>
                 <div class="action-quantity">
                     <input type="text" id="own-quantity" placeholder="Enter quantity">
                     <button id="qty1">1</button>
@@ -28,7 +28,8 @@
                 </div>
             </div>
             <div class="card-footer">
-                <p id="curr-budget">Budget: </p>
+                <p id="curr-budget">Budget: {{ budget }}</p>
+                <!-- <p id="feedback"></p> -->
             </div>
         </div>
     </body>

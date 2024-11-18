@@ -113,7 +113,7 @@ class Round:
                 round(mid_point)
                 if mid_point < 0:
                     return "market is negative."
-            self.market = [mid_point - 1, mid_point + 1]
+            self.market = [round(mid_point - 1), round(mid_point + 1)]
         else:
             face_up_card = next(card for card in self.cards if card.face_up == True)  
             face_up_value = face_up_card.get_card_rank()
@@ -122,7 +122,8 @@ class Round:
             if random.random() < 0.3:
                 offset = random.uniform(-0.3, 0.3) * mid_point  # +/- up to 30% of mid_point
                 mid_point += offset
-            self.market = [mid_point - 1, mid_point + 1] 
+                round(mid_point)
+            self.market = [round(mid_point - 1), round(mid_point + 1)] 
 
 
     #reveal and calculate value of cards
@@ -164,7 +165,7 @@ class Game:
         self.state = "lobby"
         self.last_action = None
         self.round_history = []
-
+    
     def start_game(self):
         self.round_num = 0
         self.state = "round"
