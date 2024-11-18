@@ -38,9 +38,19 @@ def round_page():
         # pnl eval phase
         if "guess" in data:         
             guess = int(data.get("guess"))
-            result = game.eval_guess(game.player, guess)
+            result = game.eval_guess(guess)
             if game.state == "results":
                 result["redirect"] = "/results"  # Redirect to results if game ends
+            #go to next round after eval
+            else:
+                market_info = game.start_round()
+                result.update({
+                    "next_round": True,
+                    "market_info": market_info["market_info"],
+                    "budget": game.player.budget,
+                    "position": game.player.position,
+                    "round": game.round_num
+                })
             return jsonify(result)
         # handle action phase (buy, sell, skip)
         else:
