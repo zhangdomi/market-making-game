@@ -49,7 +49,7 @@ def round_page():
                     "market_info": market_info["market_info"],
                     "budget": game.player.budget,
                     "position": game.player.position,
-                    "round": game.round_num
+                    "round": game.round_num,
                 })
             return jsonify(result)
         # handle action phase (buy, sell, skip)

@@ -13,7 +13,7 @@
                 </div>
             </div>
             <div class="round-no" id="roundNumber">Round {{ round }}</div>
-            <div class="market-and-action">
+            <div id="action-phase" class="market-and-action">
                 <p id="marketInfo">The market maker quotes {{ market_info[0] }} at {{ market_info[1] }}.</p>
                 <div class="action-quantity">
                     <input type="text" id="own-quantity" placeholder="Enter quantity">
@@ -26,6 +26,12 @@
                     <button id="sell">Sell</button>
                     <button id="skip">Skip</button>
                 </div>
+            </div>
+            <div id="eval-phase" class="round-eval" style="display: none;">
+                <p id="evaluationPrompt"></p>
+                <label for="pnlInput" class="text-muted">Use a minus sign (-) for losses.</label>
+                <input type="number" id="pnlInput" placeholder="Enter profit/loss">
+                <button id="submitPnl">Submit</button>
             </div>
             <div class="card-footer">
                 <p id="curr-budget">Budget: {{ budget }}</p>

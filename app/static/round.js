@@ -1,5 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
     const ownQuantityInput = document.getElementById("own-quantity");
+    const actionPhase = document.getElementById("action-phase");
+    const evalPhase = document.getElementById("eval-phase");
+    const evalPrompt = document.getElementById("evaluationPrompt");
     let selectedQuantity = 0; // Predefined quantity
 
     function setPredefinedQuantity(qty) {
@@ -30,26 +33,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (data.redirect) {
                     window.location.href = data.redirect;
                 } else {
-                    showEvaluationPhase(data.message); // Display action result
+                    actionPhase.style.display = "none"; // Hide action buttons
+                    evalPhase.style.display = "block"; // Show evaluation phase
+                    evalPrompt.textContent = `${data.message} What was your profit or loss this round?`;
                 }
             })
             .catch((error) => {
                 console.error("Error executing action:", error);
                 alert("Action failed.");
             });
-    }
-
-    function showEvaluationPhase(actionMessage) {
-        const roundContent = document.querySelector(".market-and-action"); // Locate the container
-        roundContent.innerHTML = `
-            <div class="round-evaluation">
-                <p id="evaluationPrompt">${actionMessage} What was your profit or loss this round?</p>
-                <label for="pnlInput" class="text-muted">Use a minus sign (-) for losses.</label>
-                <input type="number" id="pnlInput" placeholder="Enter profit/loss">
-                <button id="submitPnl">Submit</button>
-            </div>
-        `;
-        document.getElementById("submitPnl").addEventListener("click", submitPnl);
     }
 
     function submitPnl() {
@@ -69,10 +61,9 @@ document.addEventListener("DOMContentLoaded", () => {
             .then((data) => {
                 if (data.redirect) {
                     window.location.href = data.redirect;
-                } else if (data.next_round){
+                } else if (data["next_round"] == true){
                     alert(data.message); // Feedback on PnL evaluation
-                    // loadMarket(); // Proceed to the next rond    
-                    // updateRound(data);
+                    updateRound(data);
                 }
             })
             .catch((error) => {
@@ -80,17 +71,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("Failed to submit profit/loss.");
             });
     }
-
-    // function updateRound(data) {
-    //     // Update DOM elements with new round data
-    //     roundNumberElement.textContent = `Round ${data.round}`;
-    //     marketInfoElement.textContent = `The market maker quotes ${data.market_info[0]} at ${data.market_info[1]}.`;
-    //     currBudgetElement.textContent = `Budget: ${data.budget}`;
-    //     // Reset input fields for the next round
-    //     ownQuantityInput.value = "";
-    //     selectedQuantity = 0;
-    // }
     
+    function updateRound(data) {
+        actionPhase.style.display = "block"; // Show action buttons
+        evalPhase.style.display = "none"; // Hide evaluation phase
+
+        // Update round information dynamically without reloading the page
+        document.getElementById("roundNumber").textContent = `Round ${data.round}`;
+        document.getElementById("marketInfo").textContent = `The market maker quotes ${data.market_info[0]} at ${data.market_info[1]}.`;
+        document.getElementById("curr-budget").textContent = `Budget: ${data.budget}`;
+        ownQuantityInput.value = ""; // Reset the custom input field
+        selectedQuantity = 0; // Reset predefined quantity
+    }
 
     document.getElementById("qty1").addEventListener("click", () => setPredefinedQuantity(1));
     document.getElementById("qty5").addEventListener("click", () => setPredefinedQuantity(5));
@@ -99,5 +91,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("buy").addEventListener("click", () => playerAction("buy"));
     document.getElementById("sell").addEventListener("click", () => playerAction("sell"));
     document.getElementById("skip").addEventListener("click", () => playerAction("skip"));
+    document.getElementById("submitPnl").addEventListener("click", submitPnl);
 
 });
