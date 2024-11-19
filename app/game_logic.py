@@ -128,13 +128,17 @@ class Round:
 
     #reveal and calculate value of cards
     def reveal_cards(self):
+        return [f"{card.rank}{card.suit}" for card in self.cards]
+
+
+    def calc_val_cards(self):
         realized_value = sum(card.get_card_rank() for card in self.cards)
         return realized_value
     
     #calculate actual pnl, based on player's action
     #param: player's action, quantity, market_price
     def calc_round_pnl(self, player, player_action, input_quantity):
-        realized_value = self.reveal_cards()
+        realized_value = self.calc_val_cards()
 
         if player_action == 'buy':
             pnl = (realized_value - player.buy_price) * input_quantity
@@ -205,12 +209,7 @@ class Game:
         quantity = abs(self.player.position)
 
         actual_pnl = self.curr_round.calc_round_pnl(self.player, self.last_action, quantity)["pnl"]
-
-        # if self.last_action == "buy":
-        #     actual_pnl = self.curr_round.calc_round_pnl(self.last_action, self.player.position, self.curr_round.market[1])["pnl"]
-        # elif self.last_action == "sell":
-        #     actual_pnl = self.curr_round.calc_round_pnl(self.last_action, self.player.position, self.curr_round.market[0])["pnl"]
-            
+   
         if actual_pnl == guess:
             self.player.increase_budget(actual_pnl)
             result = {
@@ -239,7 +238,8 @@ class Game:
             "pnl": actual_pnl,
             "player_guess": guess,  
             "correct_guess": actual_pnl == guess,
-            "budget": self.player.budget
+            "budget": self.player.budget, 
+            "cards": self.curr_round.reveal_cards()
         })
         return result
     

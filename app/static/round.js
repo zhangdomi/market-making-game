@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const pnlGuess = parseInt(document.getElementById("pnlInput").value, 10);
 
         if (isNaN(pnlGuess)) {
-            alert("Please enter a valid number for proft or loss.");
+            alert("Please enter a valid number for profit or loss.");
             return;
         }
 
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (data.redirect) {
                     window.location.href = data.redirect;
                 } else if (data["next_round"] == true){
-                    alert(data.message); // Feedback on PnL evaluation
+                    // alert(data.message); // Feedback on PnL evaluation
                     updateRound(data);
                 }
             })

@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <p>PnL: ${round.pnl}</p>
                             <p>Player Guess: ${round.player_guess}</p>
                             <p>Correct Guess: ${round.correct_guess}</p>
+                            <p>Cards1: ${round.cards.join(" ")}<p>
                         </div>`
                         )
                         .join("")}
@@ -41,4 +42,29 @@ document.addEventListener("DOMContentLoaded", () => {
             resultsContainer.textContent = "Failed to fetch results.";
         });
 
+    function startNewGame(action){
+        fetch("/results", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+        })
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then(() => {
+                window.location.href = "/round";  
+            })
+            .catch((error) => {
+                console.error("Error starting a new game:", error);
+            });    
+    }
+
+    function backToLobby(){
+        window.location.href = "/";
+    }
+
+    document.getElementById("settings-but").addEventListener("click", backToLobby)
+    document.getElementById("new-game-but").addEventListener("click", startNewGame)
 });
