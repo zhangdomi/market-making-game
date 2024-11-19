@@ -18,7 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function playerAction(actionType) {
         const quantity = selectedQuantity > 0 ? selectedQuantity : parseInt(ownQuantityInput.value, 10);
 
-        if (!quantity || quantity <= 0) {
+
+        if ((!quantity || quantity <= 0) && actionType != "skip") {
             alert("Please select or enter a valid quantity.");
             return; // Prevent further execution
         }
@@ -32,7 +33,11 @@ document.addEventListener("DOMContentLoaded", () => {
             .then((data) => {
                 if (data.redirect) {
                     window.location.href = data.redirect;
-                } else {
+                }
+                else if (actionType == "skip" || data["next_round"] == true){
+                    updateRound(data)
+                }
+                else {
                     actionPhase.style.display = "none"; // Hide action buttons
                     evalPhase.style.display = "block"; // Show evaluation phase
                     evalPrompt.textContent = `${data.message} What was your profit or loss this round?`;
@@ -48,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const pnlGuess = parseInt(document.getElementById("pnlInput").value, 10);
 
         if (isNaN(pnlGuess)) {
-            alert("Please enter a valid number for profit or loss.");
+            alert("Please enter a valid number for proft or loss.");
             return;
         }
 
@@ -84,13 +89,13 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedQuantity = 0; // Reset predefined quantity
     }
 
+    document.getElementById("skip").addEventListener("click", () => playerAction("skip"));
     document.getElementById("qty1").addEventListener("click", () => setPredefinedQuantity(1));
     document.getElementById("qty5").addEventListener("click", () => setPredefinedQuantity(5));
     document.getElementById("qty10").addEventListener("click", () => setPredefinedQuantity(10));
 
     document.getElementById("buy").addEventListener("click", () => playerAction("buy"));
     document.getElementById("sell").addEventListener("click", () => playerAction("sell"));
-    document.getElementById("skip").addEventListener("click", () => playerAction("skip"));
     document.getElementById("submitPnl").addEventListener("click", submitPnl);
 
 });
