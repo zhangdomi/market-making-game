@@ -68,6 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     window.location.href = data.redirect;
                 } else if (data["next_round"] == true){
                     // alert(data.message); // Feedback on PnL evaluation
+                    document.getElementById("pnlInput").value = ""
                     updateRound(data);
                 }
             })
