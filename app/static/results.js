@@ -63,6 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function backToLobby(){
         window.location.href = "/";
+        
     }
 
     document.getElementById("settings-but").addEventListener("click", backToLobby)

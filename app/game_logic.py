@@ -243,3 +243,10 @@ class Game:
         })
         return result
     
+    def game_reset(self):
+        self.player = Player()
+        self.curr_round = None       #stores a Round class
+        self.round_num = 0
+        self.state = "lobby"
+        self.last_action = None
+        self.round_history = [] 

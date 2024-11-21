@@ -16,13 +16,16 @@
                                 <div class="level-selection">
                                     <ul class="choices">
                                         <li>
-                                            <label><input type="radio" name="question0" value="Easy" /><span>Easy</span></label>
+                                            <label><input id="easyButton" type="radio" name="question0" value="Easy" /><span>Easy</span></label>
                                         </li>
                                         <li>
-                                            <label><input type="radio" name="question0" value="Medium" /><span>Medium</span></label>
+                                            <label><input id="mediumButton" type="radio" name="question0" value="Medium" /><span>Medium</span></label>
                                         </li>
                                         <li>
-                                            <label><input type="radio" name="question0" value="Hard" /><span>Hard</span></label>
+                                            <label><input id="hardButton" type="radio" name="question0" value="Hard" /><span>Hard</span></label>
+                                        </li>
+                                        <li>
+                                            <label><input id="customButton" type="radio" name="question0" value="Custom" /><span>Custom</span></label>
                                         </li>
                                     </ul>
                                 </div>
@@ -34,21 +37,21 @@
                             </div>
                             <div class="right-col">
                                 <div class="num-cards">
-                                    <p>Number of cards: </p>
+                                    <p>Number of cards: <span id="no_of_cards"></span></p>
                                     <div class="slidecontainer-cards">
-                                        <input type="range" min="3" max="5" value="3" class="slider" id="myRange"> 
+                                        <input type="range" min="3" max="5" value="3" class="slider" id="cards_slider"> 
                                     </div>
                                 </div>
                                 <div class="num-rounds">
-                                    <p>Number of rounds: </p>
+                                    <p>Number of rounds: <span id="no_of_rounds"></span> </p>
                                     <div class="slidecontainer-rounds">
-                                        <input type="range" min="3" max="10" value="3" class="slider" id="myRange">
+                                        <input type="range" min="3" max="10" value="3" class="slider" id="rounds_slider">
                                     </div> 
                                 </div>
                                 <div class="num-seconds">
-                                    <p>Number of seconds:</p>
+                                    <p>Number of seconds: <span id="no_of_seconds"></span> </p>
                                     <div class="slidecontainer-seconds">
-                                        <input type="range" min="10" max="60" value="60" class="slider" id="myRange">
+                                        <input type="range" min="10" max="60" value="60" step="5" class="slider" id="seconds_slider">
                                     </div> 
                                 </div>
                             </div>

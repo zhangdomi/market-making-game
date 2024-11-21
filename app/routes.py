@@ -4,10 +4,11 @@ from app.game_logic import Game
 
 app = Blueprint('app',__name__)
 
-game = Game(rounds=3)
+game = Game(rounds=3)                   #set to 0 eventually
 
 @app.route("/")
 def lobby():
+    game.game_reset()
     return render_template("lobby.html")  # Lobby page
 
 @app.route("/round", methods=["GET", "POST"])
